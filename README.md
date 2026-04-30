@@ -1,4 +1,4 @@
-## ING301 Prosjekt - Del C
+## ING301 Prosjekt - Del C 
 
 I del C av prosjektet skal dere implementere en nettverksapplikasjon bestående av fire deler:
 
