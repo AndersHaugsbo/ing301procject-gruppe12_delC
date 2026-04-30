@@ -59,30 +59,39 @@ def get_floor(fid: int) -> Response:
 @app.get("/smarthouse/floor/{fid}/room")
 def get_rooms(fid: int) -> list[RoomInfo]:
 
-    # TODO
-
+    for f in smarthouse.get_floors():
+        if f.level == fid:
+            rooms = []
+            for r in f.rooms:
+                rooms.append(RoomInfo.from_obj(r))
+            return rooms
     return []
 
 
 @app.get("/smarthouse/floor/{fid}/room/{rid}")
 def get_room(fid: int, rid: int) -> Response:
 
-    # TODO
-
+    for f in smarthouse.get_floors():
+        if f.level == fid:
+            for r in f.rooms:
+                if r.rid == rid:
+                    return JSONResponse(content = jsonable_encoder(RoomInfo.from_obj(r)))
     return Response(status_code=404)
 
 @app.get("/smarthouse/device")
 def get_devices() -> list[DeviceInfo]:
 
-    # TODO
-
-    return []
+    devices = []
+    for d in smarthouse.get_devices():
+        devices.append(DeviceInfo.from_obj(d))
+    return devices
 
 @app.get("/smarthouse/device/{uuid}")
 def get_device(uuid: str) -> Response:
 
-    # TODO
-
+    d = smarthouse.get_device_by_id(uuid)
+    if d:
+        return JSONResponse(content=jsonable_encoder(DeviceInfo.from_obj(d)))
     return Response(status_code=404)
 
 #
@@ -92,22 +101,29 @@ def get_device(uuid: str) -> Response:
 @app.get("/smarthouse/sensor/{uuid}/current")
 def read_measurement(uuid: str) -> Response:
 
-    # TODO
-
+    d = smarthouse.get_device_by_id(uuid)
+    if d and d.is_sensor():
+        m = d.get_current()
+        if m:
+            return JSONResponse(content=jsonable_encoder(m))
     return Response(status_code=404)
 
 @app.put("/smarthouse/sensor/{uuid}/current")
 def update_sensor_measurement(uuid: str, measurement: Measurement) -> Response:
 
-    # TODO
-
+    d = smarthouse.get_device_by_id(uuid)
+    if d and d.is_sensor():
+        d.set_current(measurement)
+        return Response(status_code=200)
     return Response(status_code=404)
 
 @app.delete("/smarthouse/sensor/{uuid}/current")
 def delete_measurement(uuid: str) -> Response:
 
-    # TODO
-
+    d = smarthouse.get_device_by_id(uuid)
+    if d and d.is_sensor():
+        d.current = None
+        return Response(status_code=200)
     return Response(status_code=404)
 
 #
@@ -117,15 +133,23 @@ def delete_measurement(uuid: str) -> Response:
 @app.get("/smarthouse/actuator/{uuid}/state")
 def read_actuator_state(uuid: str) -> Response:
 
-    # TODO
-
+    d = smarthouse.get_device_by_id(uuid)
+    if d and d.is_actuator():
+        state = "on" if d.is_active() else "off"
+        return JSONResponse(content=jsonable_encoder({"state": state}))
     return Response(status_code=404)
 
 @app.put("/smarthouse/actuator/{uuid}/state")
 def update_sensor_state(uuid: str, target_state: ActuatorStateInfo) -> Response:
 
-    # TODO
+    d = smarthouse.get_device_by_id(uuid)
+    if d and d.is_actuator():
+        if target_state.state == "on":
+            d.turn_on()
+        else:
+            d.turn_off()
 
+        return Response(status_code=200)
     return Response(status_code=404)
 
 if __name__ == '__main__':

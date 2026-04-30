@@ -48,22 +48,35 @@ class RoomInfo(BaseModel):
 
     @staticmethod
     def from_obj(room: Room) -> RoomInfo:
-
-        # TODO
-        pass
+        
+        return RoomInfo(
+            rid=room.rid,
+            room_size=room.room_size,
+            room_name=room.room_name,
+            floor=room.floor.level,
+            devices=[d.id for d in room.devices]
+        )
 
 class DeviceInfo(BaseModel):
-
-    # TODO
+    
+    id: str
+    device_type: str
+    supplier: str
+    model_name: str
+    is_sensor: bool
+    is_actuator: bool
 
     @staticmethod
     def from_obj(device: Device) -> DeviceInfo:
-
-        # TODO
-        pass
+        
+        return DeviceInfo(
+            id=device.id,
+            device_type=device.device_type,
+            supplier=device.supplier,
+            model_name=device.model_name,
+            is_sensor=device.is_sensor(),
+            is_actuator=device.is_actuator()
+        )
 
 class ActuatorStateInfo(BaseModel):
-
-    # TODO
-    pass
-
+    state: str
