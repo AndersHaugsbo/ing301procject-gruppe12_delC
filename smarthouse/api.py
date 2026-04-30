@@ -4,6 +4,7 @@ from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse, JSONResponse
 from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
 
 from tests.demo_house import DEMO_HOUSE
 
@@ -13,6 +14,14 @@ from smarthouse.dto import SmartHouseInfo, FloorInfo, RoomInfo, DeviceInfo, Actu
 from pathlib import Path
 import os
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 smarthouse = DEMO_HOUSE
 

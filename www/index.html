@@ -1,13 +1,52 @@
 
- <html>
-        <head>
-            <title>SmartHouse Cloud Service</title>
-        </head>
-        <body>
-            <h1>Welcome to the ING301 SmartHouse Cloud Service</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SmartHouse</title>
+</head>
+<body>
+    <h1>Welcome to the ING301 SmartHouse Cloud Service</h1>
 
-            <p>
-                <img src="smarthouse.png" alt="SmartHouse" width="500">
-            </p>
-        </body>
- </html>
+<p>
+    <img src="smarthouse.png" alt="SmartHouse" width="500">
+</p>
+
+<h1>SmartHouse Control</h1>
+
+<button onclick="getTemp()">Show Temperature</button>
+<button onclick="toggleLight()">Toggle Light</button>
+
+<p id="output"></p>
+
+<script>
+async function getTemp() {
+    const res = await fetch("http://127.0.0.1:8000/smarthouse/sensor/4d8b1d62-7921-4917-9b70-bbd31f6e2e8e/current");
+    const data = await res.json();
+
+    document.getElementById("output").innerText =
+        "Temperature: " + data.value + " " + data.unit;
+}
+
+async function toggleLight() {
+    // 1. hent state
+    const res = await fetch("http://127.0.0.1:8000/smarthouse/actuator/6b1c5f6b-37f6-4e3d-9145-1cfbe2f1fc28/state");
+    const data = await res.json();
+
+    let newState = data.state === "on" ? "off" : "on";
+
+    // 2. oppdater state
+    await fetch("http://127.0.0.1:8000/smarthouse/actuator/6b1c5f6b-37f6-4e3d-9145-1cfbe2f1fc28/state", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ state: newState })
+    });
+
+    document.getElementById("output").innerText =
+        "Light is now " + newState;
+}
+</script>
+
+</body>
+</html>
