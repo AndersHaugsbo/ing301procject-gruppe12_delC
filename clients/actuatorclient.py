@@ -27,11 +27,12 @@ class ActuatorClient:
         """
 
         logging.info(f"Actuator Client {self.did} retrieving state")
-        actuator_state = None
-
-        # TODO
-
-        return None
+        
+        url = common.BASE_URL + f"actuator/{self.did}/state"
+        response = requests.get(url)
+        actuator_state = common.ActuatorState.from_json_str(response.text)
+        
+        return actuator_state.state
 
 
     def run(self):
@@ -40,8 +41,15 @@ class ActuatorClient:
         to set the current state of the light bulb in accordance with the state
         in the cloud service
         """
+        while True:
 
-        # TODO
+            state = self.get_state()
+
+            if state != self.state.state:
+                logging.info(f"Updating actuator {self.did} to {state}")
+                self.state.set_state(state)
+
+            time.sleep(LIGHTBULB_CLIENT_SLEEP_TIME)
 
 
 if __name__ == '__main__':

@@ -43,9 +43,14 @@ class SensorClient:
         """
 
         logging.info(f"Sensor client {self.did} update starting")
-        response = None
+        
+        url = common.BASE_URL + f"sensor/{self.did}/current"
+        headers = {
+            "Content-Type": "application/json"
+        }
+        response = requests.put(url, headers=headers, data=m.to_json_str())
 
-        # TODO
+        logging.info(f"Sensor client {self.did} update done: {response.status_code}")
         return response
 
 
